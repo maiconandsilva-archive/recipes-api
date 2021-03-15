@@ -1,0 +1,27 @@
+version: '3.0'
+
+services:
+  receitas:
+    depends_on:
+      - db
+    build:
+      context: .
+      target: receitas
+    ports:
+      - 80:5000
+    restart: always
+    volumes:
+      - ./:/app:cached
+  
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:      
