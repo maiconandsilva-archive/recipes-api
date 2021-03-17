@@ -1,27 +1,25 @@
-version: '3.0'
+version: '3.8'
 
 services:
-  receitas:
+  backend:
     depends_on:
       - db
     build:
       context: .
-      target: receitas
-    ports:
-      - 80:5000
+      target: runtime
     restart: always
+    env_file:
+      - conf/.env
     volumes:
-      - ./:/app:cached
+      - ./:/app
   
   db:
     image: postgres
     restart: always
-    environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    env_file:
+      - conf/db.env
     volumes:
       - db_data:/var/lib/postgresql/data
 
 volumes:
-  db_data:      
+  db_data:

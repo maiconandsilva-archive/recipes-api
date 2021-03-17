@@ -1,0 +1,21 @@
+# Environment files
+conf/db.env
+conf/sample.*
+
+.git
+
+# IDEs
+.idea
+.vscode
+
+# Pre compiled code
+
+### Sass ###
+.sass-cache/
+*.css
+*.sass
+*.scss
+
+# Generated code
+.venv
+.pytest_cache/
