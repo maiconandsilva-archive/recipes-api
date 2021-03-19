@@ -1,3 +1,10 @@
+# Custom
+conf/gunicorn.conf.py
+conf/application.conf.py
+db.env
+
+docker-compose.override.yml
+# End Custom
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,git,sass,grunt,node,vscode,intellij,pycharm
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,git,sass,grunt,node,vscode,intellij,pycharm

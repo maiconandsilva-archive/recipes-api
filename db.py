@@ -1,56 +1,55 @@
-import os
-
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import DeclarativeMeta
+from sqlalchemy import event, DDL
+from sqlalchemy.engine import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.orm import scoped_session
+from sqlalchemy.orm.scoping import scoped_session
+from sqlalchemy.orm.session import sessionmaker
+from sqlalchemy.schema import CreateSchema
 
-
-class BaseModelMeta(DeclarativeMeta):
-    @property
-    def session(self):
-        if '__bind_key__' in self:
-            return self._sessions[self.__bind_key__]
-        return self._session
-        
-    def save(self, commit=False):
-        self.add(self)
-        if commit:
-            self.commit()
-    
-    def delete(self, commit=False):
-        self.session.delete(self)
-        if commit:
-            self.commit()
-        
-    def __getattr__(self, name):
-        attr = getattr(self.session, name)
-        if callable(attr):
-            def wrapper(*args, **kwargs):
-                return attr(*args, **kwargs)
-            return wrapper
-        return attr    
+from models.base import Base
 
 
 class SQLAlchemy:
-    def __init__(self, app=None, scopefunc=None, **kwargs):
-        self.Model = declarative_base(metaclass=BaseModelMeta)
+    def __init__(self, app=None, **kwargs):
+        self.Model = declarative_base(cls=Base, name='Model')
         if app:
-            self.init_app(app, scopefunc, **kwargs)
+            self.init_app(app, **kwargs)
     
     def init_app(self, app, **kwargs):
-        dburi = app.config.get('SQLALCHEMY_DATABASE_URI')
-        binds = app.config.get('SQLALCHEMY_BINDS', {}).copy()
         kwargs.setdefault('autocommit', False)
         kwargs.setdefault('autoflush', False)
-        kwargs.get('connect_args', {}).setdefault('check_same_thread', False)
+        kwargs.setdefault('engine_cfg', {})
         
-        for key, uri in binds:
-            binds[key] = self.__make_session(uri, **kwargs)
-        self.Model._sessions = binds
-        self.Model._session = self.__make_session(dburi, **kwargs)
+        self.__make_session(**kwargs)
+        
+        self.Model.query = self.session.query_property()
+        self.Model.session = self.session
 
-    def __make_session(self, dburi, **kwargs):
-        SessionLocal = sessionmaker(create_engine(dburi, **kwargs), **kwargs)
-        return scoped_session(SessionLocal, scopefunc=kwargs.get('scopefunc'))
+        self.__add_db_hooks_to_app(app)
+
+    def create_all(self):
+        self.create_schemas()
+        self.Model.metadata.create_all(bind=self.engine)
+
+    def create_schemas(self):
+        for mapper in self.Model.registry.mappers:
+            cls = mapper.class_
+            if issubclass(cls, self.Model):
+                table_args = getattr(cls, '__table_args__', None)
+                if table_args:
+                    schema = table_args.get('schema')
+                    if schema:
+                        query = f"CREATE SCHEMA IF NOT EXISTS {schema}"
+                        event.listen(
+                            self.Model.metadata, 'before_create', DDL(query))
+
+    def __add_db_hooks_to_app(self, app):
+        @app.teardown_appcontext
+        def shutdown_session(exception=None):
+            self.session.remove()
+
+    def __make_session(self, **kwargs):
+        self.engine = create_engine(kwargs.pop('dburi'),
+                                    **kwargs.pop('engine_cfg'))
+        self.SessionLocal = sessionmaker(bind=self.engine, **kwargs)
+        self.session = scoped_session(
+            self.SessionLocal, scopefunc=kwargs.pop('scopefunc', None))
