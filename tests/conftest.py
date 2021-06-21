@@ -2,14 +2,14 @@ import pytest
 import wsgi
 
 
-@pytest.fixture
-def client():
-    """Flask application context and database initialization."""
+app = wsgi.create_app()
+app.testing = True
 
-    app = wsgi.create_app()
-    app.config['TESTING'] = True
+with app.app_context():
+    wsgi.init_db()
 
-    with app.test_client() as client_ctx:
-        with app.app_context():
-            wsgi.init_db()
+with app.test_client() as client_ctx:
+    @pytest.fixture
+    def client():
+        """Flask application context and database initialization."""
         yield client_ctx
