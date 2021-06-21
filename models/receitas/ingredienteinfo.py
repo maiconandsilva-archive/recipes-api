@@ -1,10 +1,13 @@
-from sqlalchemy import Column, ForeignKey, String, Integer
+
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql.schema import ForeignKey
+from sqlalchemy.sql.sqltypes import String
 
 from exts import db
+from ..utils import Column, Describable
+from .unidademedida import UnidadeMedida
 
-
-class IngredienteInfo(db.Model):
+class IngredienteInfo(Describable, db.Model):
     """
     Esta classe vai ser usada como uma parte da classe Ingrediente.
     Foi separada para ser possível fazer a pesquisa de ingredientes
@@ -12,10 +15,6 @@ class IngredienteInfo(db.Model):
     """
 
     __tablename__ = 'ingrediente_info'
-    __table_args__ = {
-        'schema': 'receitas'
-    }
 
-    unidade_id = Column(Integer, ForeignKey('receitas.unidade.id'))
-    nome = Column(String(25))
-    unidade = relationship('Unidade')
+    unidade_id = Column(String(20), ForeignKey('unidade_medida.id'))
+    unidade_medida = relationship('UnidadeMedida')

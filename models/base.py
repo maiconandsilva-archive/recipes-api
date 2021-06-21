@@ -1,20 +1,18 @@
-from sqlalchemy import Column, Integer
+from sqlalchemy.sql.schema import Column
+from sqlalchemy.sql.sqltypes import Integer
+
+import exts
 
 
 class Base:
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
 
     def save(self, commit=False):
-        self.session.add(self)
+        exts.db.session.add(self)
         if commit:
-            self.session.commit()
+            exts.db.session.commit()
 
     def delete(self, commit=False):
-        self.session.delete(self)
+        exts.db.session.delete(self)
         if commit:
-            self.session.commit()
-
-    def __repr__(self):
-        if hasattr(self, 'nome'):
-            return self.nome
-        return super.__repr__()
+            exts.db.session.commit()

@@ -1,20 +1,20 @@
-from sqlalchemy import Column, ForeignKey, String, Integer
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql.schema import ForeignKey
+from sqlalchemy.sql.sqltypes import Integer, Text
 
 from exts import db
+from ..utils import Column, Describable, TimeRecordableCRUD
+from .secondary import CategoriaReceita
 
-
-class Receita(db.Model):
+class Receita(TimeRecordableCRUD, Describable, db.Model):
     __tablename__ = 'receita'
-    __table_args__ = {
-        'schema': 'receitas'
-    }
 
-    usuario_id = Column(Integer, ForeignKey('usuarios.usuario.id'))
-    nome = Column(String(50))
-    modo_preparo = Column(String(1000))
-    ingredientes = relationship('Ingrediente',
-                                secondary='receitas.receita_ingredientes')
+    usuario_id = Column(Integer, ForeignKey('usuario.id', ondelete='SET NULL'),
+                        nullable=True)
 
-    # Criador das receitas
-    usuario = relationship('Usuario', backref='receitas')
+    modo_preparo = Column(Text)
+    ingredientes = relationship('Ingrediente', backref='receita',
+                                cascade="all, delete", passive_deletes=True)
+    categorias = relationship('Categoria', secondary=CategoriaReceita,
+                              backref='receitas')
+    criador = relationship('Usuario', backref='receitas')

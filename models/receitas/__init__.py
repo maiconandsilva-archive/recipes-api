@@ -1,5 +1,9 @@
-from .unidade import *
+from .unidademedida import *
 from .ingredienteinfo import *
 from .ingrediente import *
+from .categoria import *
 from .receita import *
-from .receita_ingrediente import *
+
+__all__ = [
+    'Receita', 'Categoria', 'Ingrediente', 'IngredienteInfo', 'UnidadeMedida',
+]
