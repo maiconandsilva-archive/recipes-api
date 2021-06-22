@@ -7,19 +7,21 @@ services:
     build:
       context: .
       target: runtime
+      args:
+        ENV: production
     restart: always
     env_file:
       - conf/.env
     volumes:
       - ./:/app
-  
+
   db:
-    image: postgres
+    image: mariadb
     restart: always
     env_file:
       - conf/db.env
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - db_data:/var/lib/mysql
 
 volumes:
   db_data:

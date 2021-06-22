@@ -8,9 +8,10 @@ gunicorn = "*"
 flask = "*"
 sqlalchemy = "*"
 psycopg2-binary = "*"
-pytest = "*"
+pymysql = "*"
 
 [dev-packages]
+pytest = "*"
 
 [requires]
-python_version = "3.8"
+python_version = "3.9"
