@@ -1,20 +1,29 @@
+from dataclasses import dataclass
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import ForeignKey
 from sqlalchemy.sql.sqltypes import Integer, Text
+import typing as t
 
-from exts import db
-from ..utils import Column, Describable, TimeRecordableCRUD
+from ..usuario.usuario import Usuario
+from ..utils import BaseModel, Column, Describable, TimeRecordableCRUD
+from .categoria import Categoria
+from .ingrediente import Ingrediente
 from .secondary import CategoriaReceita
 
-class Receita(TimeRecordableCRUD, Describable, db.Model):
+
+@dataclass
+class Receita(TimeRecordableCRUD, Describable, BaseModel):
     __tablename__ = 'receita'
 
-    usuario_id = Column(Integer, ForeignKey('usuario.id', ondelete='SET NULL'),
-                        nullable=True)
+    categorias: t.List[Categoria]
+    ingredientes: t.List[Ingrediente]
 
-    modo_preparo = Column(Text)
+    usuario_id: int = Column(Integer, ForeignKey('usuario.id', ondelete='SET NULL'),
+                             nullable=True)
+
+    modo_preparo: str = Column(Text)
     ingredientes = relationship('Ingrediente', backref='receita',
                                 cascade="all, delete", passive_deletes=True)
     categorias = relationship('Categoria', secondary=CategoriaReceita,
                               backref='receitas')
-    criador = relationship('Usuario', backref='receitas')
+    criador: Usuario = relationship('Usuario', backref='receitas')

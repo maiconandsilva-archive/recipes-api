@@ -1,30 +1,39 @@
 from sqlalchemy import event, DDL
 from sqlalchemy.engine import create_engine
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm.query import Query
 from sqlalchemy.orm.scoping import scoped_session
-from sqlalchemy.orm.session import sessionmaker
-from sqlalchemy.schema import CreateSchema
+from sqlalchemy.orm.session import Session, sessionmaker
 
 from models.base import Base
 
 
 class SQLAlchemy:
     def __init__(self, app=None, **kwargs):
-        self.Model = declarative_base(cls=Base, name='Model')
+        self.Model: Base = declarative_base(cls=Base, name='Model')
         if app:
             self.init_app(app, **kwargs)
-    
+
     def init_app(self, app, **kwargs):
         kwargs.setdefault('autocommit', False)
         kwargs.setdefault('autoflush', False)
         kwargs.setdefault('engine_cfg', {})
-        
+
         self.__make_session(**kwargs)
-        
-        self.Model.query = self.session.query_property()
+
+        query: Query = self.session.query_property()
+
+        self.Model.query = query
         self.Model.session = self.session
 
         self.__add_db_hooks_to_app(app)
+
+    def drop_all(self):
+        self.delete_schemas()
+        self.Model.metadata.drop_all(bind=self.engine)
+
+    def delete_schemas(self):
+        pass
 
     def create_all(self):
         self.create_schemas()
@@ -51,5 +60,5 @@ class SQLAlchemy:
         self.engine = create_engine(kwargs.pop('dburi'),
                                     **kwargs.pop('engine_cfg'))
         self.SessionLocal = sessionmaker(bind=self.engine, **kwargs)
-        self.session = scoped_session(
+        self.session: Session = scoped_session(
             self.SessionLocal, scopefunc=kwargs.pop('scopefunc', None))

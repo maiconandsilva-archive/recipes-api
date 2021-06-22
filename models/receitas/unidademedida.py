@@ -1,10 +1,11 @@
+from dataclasses import dataclass
 from sqlalchemy.sql.sqltypes import String
 
-from exts import db
-from ..utils import Column, Describable
+from ..utils import BaseModel, Column, Describable
 
 
-class UnidadeMedida(Describable, db.Model):
+@dataclass
+class UnidadeMedida(Describable, BaseModel):
     __tablename__ = 'unidade_medida'
-    
-    id = Column(String(20), primary_key=True)
+
+    id: str = Column(String(20), primary_key=True)

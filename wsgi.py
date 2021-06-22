@@ -17,13 +17,18 @@ def init_db():
     exts.db.create_all()
 
 
+def drop_db():
+    exts.db.drop_all()
+
+
 def create_app():
     app = Flask(__name__)
 
     # Settings
-    cfg = import_string(os.getenv('FLASK_SETTINGS'), silent=True)
-    if cfg:
-        app.config.from_object(cfg())
+    if (fs := os.getenv('FLASK_SETTINGS')) and \
+        (Config := import_string(fs, silent=True)):
+
+        app.config.from_object(Config())
 
     app.config.from_envvar('FLASK_SETTINGS_FILE', silent=True)
     app.config.from_pyfile('conf/application.conf.py')
@@ -33,6 +38,10 @@ def create_app():
 
     if app.debug:
         app.wsgi_app = DebuggedApplication(app.wsgi_app, evalex=True)
+        app.logger.warning(" * Debugger is active!")
+
+        if app.wsgi_app.pin:
+            app.logger.info(" * Debugger PIN: %s", app.wsgi_app.pin)
 
     # Blueprints
     # app.register_blueprint(bp.receita)

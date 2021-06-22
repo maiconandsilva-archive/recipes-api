@@ -1,3 +1,4 @@
+from sqlalchemy.orm.query import Query
 from sqlalchemy.sql.schema import Column
 from sqlalchemy.sql.sqltypes import Integer
 
@@ -5,7 +6,7 @@ import exts
 
 
 class Base:
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id: int = Column(Integer, primary_key=True, autoincrement=True)
 
     def save(self, commit=False):
         exts.db.session.add(self)
