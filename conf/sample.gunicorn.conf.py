@@ -1,5 +1,8 @@
 # Sample Gunicorn configuration file.
 
+# Capture stdout/stderr
+capture_output = True
+
 #
 # Server socket
 #
