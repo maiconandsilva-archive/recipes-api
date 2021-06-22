@@ -1,4 +1,6 @@
-FROM python:3.8-slim as base
+ARG ENV
+
+FROM python:3.9-slim as base
 
 # Setup env
 ENV LANG C.UTF-8
@@ -14,7 +16,11 @@ RUN pip install pipenv
 # Install python dependencies
 COPY Pipfile ./
 COPY Pipfile.lock ./
-RUN PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy --ignore-pipfile
+RUN if test "x$ENV" = "xproduction"; then \
+        PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy --ignore-pipfile; \
+    else \
+        PIPENV_VENV_IN_PROJECT=1 pipenv install --dev; \
+    fi
 
 
 FROM base AS runtime
