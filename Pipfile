@@ -9,6 +9,9 @@ flask = "*"
 sqlalchemy = "*"
 psycopg2-binary = "*"
 pymysql = "*"
+sqlalchemy-utils = "*"
+flask-wtf = "*"
+passlib = "*"
 
 [dev-packages]
 pytest = "*"
