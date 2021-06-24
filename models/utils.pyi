@@ -9,5 +9,4 @@ class BaseModel(exts.db.Model):
     session: orm.Session
 
     def serialize(self, *, ignore: Callback=None, mapdict: Callback=None,
-                global_ignore: Callback=None, global_mapdict: Callback=None,
-                dict_factory=dict) -> dict: ...
+                  dict_factory=dict) -> dict: ...
