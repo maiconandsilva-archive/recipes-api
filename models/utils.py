@@ -1,26 +1,13 @@
-from dataclasses import dataclass, is_dataclass, asdict
+from dataclasses import dataclass
 from datetime import datetime
 from functools import wraps
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm import session
-from sqlalchemy.orm.query import Query
 from sqlalchemy.sql.functions import func
 from sqlalchemy.sql.schema import Column as SAColumn
-from sqlalchemy.sql.sqltypes import String, TIMESTAMP, Text
+from sqlalchemy.sql.sqltypes import Integer, String, TIMESTAMP, Text
 
 from exts import db
-
-
-class BaseModel(db.Model):
-    __abstract__ = True
-
-    query: Query
-    session: session.Session
-
-    def asdict(self) -> dict:
-        assert is_dataclass(self), \
-            'You need to add the @dataclass anotation to %s' % self.__class__
-        return asdict(self)
+from .serialization import serialize
 
 
 class Column(SAColumn):
@@ -34,6 +21,26 @@ class Column(SAColumn):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('nullable', False)
         super().__init__(*args, **kwargs)
+
+
+@dataclass(init=False)
+class BaseModel(db.Model):
+    __abstract__ = True
+
+    id: int = Column(Integer, primary_key=True, autoincrement=True)
+
+    def save(self, commit=False):
+        db.session.add(self)
+        if commit:
+            db.session.commit()
+
+    def delete(self, commit=False):
+        db.session.delete(self)
+        if commit:
+            db.session.commit()
+
+    def serialize(self, **kwargs) -> dict:
+        return serialize(self, **kwargs)
 
 
 @dataclass(init=False)

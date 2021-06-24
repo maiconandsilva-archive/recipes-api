@@ -5,12 +5,10 @@ from sqlalchemy.orm.query import Query
 from sqlalchemy.orm.scoping import scoped_session
 from sqlalchemy.orm.session import Session, sessionmaker
 
-from models.base import Base
-
 
 class SQLAlchemy:
     def __init__(self, app=None, **kwargs):
-        self.Model: Base = declarative_base(cls=Base, name='Model')
+        self.Model = declarative_base(name='Model')
         if app:
             self.init_app(app, **kwargs)
 

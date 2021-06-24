@@ -3,7 +3,6 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import ForeignKey
 from sqlalchemy.sql.sqltypes import Boolean, Integer, String
 
-from ..fractiontype import IntFractionType
 from ..utils import BaseModel, Column, proxy_association_for
 from .ingredienteinfo import IngredienteInfo
 from .unidademedida import UnidadeMedida
