@@ -1,4 +1,4 @@
-from dataclasses import asdict
+from dataclasses import asdict, is_dataclass, make_dataclass
 from functools import partial
 import typing as t
 
@@ -39,8 +39,11 @@ def _dictfactory(properties: t.List, /, *, ignore=None, mapdict=None,
     return dict_factory(props)
 
 
+_DummyDataclass = make_dataclass('DummyDataclass', ('container', ))
 
 def _serialize(obj, /, **kwargs) -> dict:
+    if not is_dataclass(obj):
+        obj = _DummyDataclass(container=obj)
     return asdict(obj, dict_factory=partial(_dictfactory, **kwargs))
 
 serialize = partial(_serialize, global_ignore=_g_ignore, global_mapdict=_g_map)
