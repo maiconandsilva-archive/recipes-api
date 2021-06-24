@@ -1,5 +1,4 @@
 import pytest
-import sys
 
 from models.usuario import *
 from models.receitas import *
@@ -8,6 +7,7 @@ from models.receitas import *
 @pytest.fixture
 def usuario_teste():
     yield Usuario.query.filter(Usuario.email == 'test@test.com').one_or_none()
+
 
 @pytest.fixture
 def receita():
@@ -27,8 +27,18 @@ def test_create_receita(usuario_teste):
     receita = Receita(
         nome='Arroz Doce',
         descricao='Uma delícia, esse é o verdadeiro arroz doce.',
-        modo_preparo='Arroz Doce',
+        modo_preparo=[
+            'Cozinhe o arroz no leite, juntamente com a canela (utilize uma '
+                'panela grande para que o leite ferva e não derrame).',
+            'Após 20 minutos, mexa de tempos em tempos.',
+            'Acrescente o açúcar e deixe por 20 minutos.',
+            'Logo em seguida, acrescente o leite condensado e deixe por mais '
+                '20 minutos.',
+            'Coloque em uma linda travessa.',
+        ],
+        tempo_preparo=45,
         criador=usuario_teste,
+        rendimento_porcoes=5,
         ingredientes = [Ingrediente(
             nome = 'Leite Condensado',
             quantidade = 1,
