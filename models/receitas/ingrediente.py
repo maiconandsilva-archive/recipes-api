@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import ForeignKey
-from sqlalchemy.sql.sqltypes import Boolean, Integer
+from sqlalchemy.sql.sqltypes import Boolean, Integer, String
 
+from ..fractiontype import IntFractionType
 from ..utils import BaseModel, Column, proxy_association_for
 from .ingredienteinfo import IngredienteInfo
 from .unidademedida import UnidadeMedida
@@ -15,7 +16,7 @@ class Ingrediente(BaseModel):
     receita_id: int = Column(Integer, ForeignKey('receita.id', ondelete='CASCADE'))
     info_id: int = Column(Integer, ForeignKey(IngredienteInfo.id, ondelete='CASCADE'))
 
-    quantidade = Column(Integer, default=1)
+    quantidade: str = Column(String(50), default=1)
     opcional: bool = Column(Boolean, default=False)
 
     info: IngredienteInfo = relationship('IngredienteInfo', lazy='joined')

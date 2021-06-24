@@ -1,4 +1,4 @@
-from dataclasses import asdict, is_dataclass
+from dataclasses import dataclass, is_dataclass, asdict
 from datetime import datetime
 from functools import wraps
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -24,17 +24,25 @@ class BaseModel(db.Model):
 
 
 class Column(SAColumn):
+    def params(self, *optionaldict, **kwargs):
+        super().params(*optionaldict, **kwargs)
+
+    def unique_params(self, *optionaldict, **kwargs):
+        super().params(*optionaldict, **kwargs)
+
     @wraps(SAColumn.__init__)
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('nullable', False)
         super().__init__(*args, **kwargs)
 
 
+@dataclass(init=False)
 class Describable:
-    nome: str = Column(String(50))
+    nome: str = Column(String(100))
     descricao: str = Column(Text, nullable=True)
 
 
+@dataclass(init=False)
 class TimeRecordableCRUD:
     created_on: datetime = Column(TIMESTAMP, server_default=func.now())
     last_updated_on: datetime = Column(TIMESTAMP, onupdate=func.now(),
