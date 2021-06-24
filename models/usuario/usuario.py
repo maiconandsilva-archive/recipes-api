@@ -3,12 +3,11 @@ from sqlalchemy import String
 import sqlalchemy_utils as su
 import uuid
 
-from exts import db
-from ..utils import Column, TimeRecordableCRUD
+from ..utils import BaseModel, Column, TimeRecordableCRUD
 
 
 @dataclass
-class Usuario(TimeRecordableCRUD, db.Model):
+class Usuario(TimeRecordableCRUD, BaseModel):
     __tablename__ = 'usuario'
 
     id: str = Column(su.UUIDType, primary_key=True, default=uuid.uuid4)
