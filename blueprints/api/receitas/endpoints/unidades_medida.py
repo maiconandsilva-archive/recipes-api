@@ -1,9 +1,11 @@
+from typing import List
+
 from models.receitas import UnidadeMedida
 from models.serialization import serialize
-from ..blueprint import unidades_medida
+from ..blueprint import bp_unidades_medida
 
 
-@unidades_medida.route('/')
+@bp_unidades_medida.route('/')
 def listar():
-    unidade_medida: UnidadeMedida = UnidadeMedida.query.all()
+    unidade_medida: List[UnidadeMedida] = UnidadeMedida.query.all()
     return serialize(unidade_medida)

@@ -1,18 +1,19 @@
 from flask import abort
+from typing import List
 
 from blueprints.utils import requer_autenticacao
 from models.receitas import Receita
 from models.serialization import serialize
-from ..blueprint import receitas
+from ..blueprint import bp_receitas
 
 
-@receitas.route('/')
+@bp_receitas.route('/')
 def listar():
-    receita: Receita = Receita.query.all()
+    receita: List[Receita] = Receita.query.all()
     return serialize(receita)
 
 
-@receitas.route('/buscar/<busca>')
+@bp_receitas.route('/buscar/<busca>')
 def buscar(busca: str):
     receita: Receita
 
@@ -25,13 +26,11 @@ def buscar(busca: str):
     return serialize(receita)
 
 
-@receitas.route('/<int:receita_id>')
+@bp_receitas.route('/<int:receita_id>')
 def buscar_por_id(receita_id: int):
     receita: Receita = Receita.query.get(receita_id)
 
     if receita is None:
         abort(404)
 
-    ignore_email = lambda prop: prop[0] != 'email'
-    return receita.serialize(ignore=ignore_email), 200
-
+    return receita.serialize(ignore=lambda prop: prop[0] != 'email')

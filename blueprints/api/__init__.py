@@ -3,6 +3,7 @@ from flask.blueprints import Blueprint
 from .receitas.endpoints import *
 
 
-api = Blueprint('api', __name__)
+bp_api = Blueprint('api', __name__)
 
-api.register_blueprint(receitas)
+bp_api.register_blueprint(bp_receitas)
+

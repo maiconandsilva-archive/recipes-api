@@ -1,4 +1,6 @@
 import os
+import pprint as pp
+import wtforms_json
 from flask import Flask
 from werkzeug.debug import DebuggedApplication
 from werkzeug.utils import import_string
@@ -11,6 +13,8 @@ from models.usuario import *
 
 def init_extensions(app):
     exts.db.init_app(app, dburi=app.config['SQLALCHEMY_DATABASE_URI'])
+    exts.csrf.init_app(app)
+    wtforms_json.init()
 
 
 def init_db():
@@ -26,27 +30,31 @@ def create_app():
 
     # Settings
     if (fs := os.getenv('FLASK_SETTINGS')) and \
-        (Config := import_string(fs, silent=True)):
-
+            (Config := import_string(fs, silent=True)):
         app.config.from_object(Config())
 
     app.config.from_envvar('FLASK_SETTINGS_FILE', silent=True)
     app.config.from_pyfile('conf/application.conf.py')
+
+    # UPGRADE VERSION WHEN THE NEWER API IS NOT COMPATIBLE WITH THE PREVIOUS
+    app.config.setdefault('API_VERSION', '1')
 
     # Extensions
     init_extensions(app)
 
     if app.debug:
         app.wsgi_app = DebuggedApplication(app.wsgi_app, evalex=True)
-        app.logger.warning(" * Debugger is active!")
+        app.logger.debug(" * Debugger is active!")
 
         if app.wsgi_app.pin:
-            app.logger.info(" * Debugger PIN: %s", app.wsgi_app.pin)
+            app.logger.debug(" * Debugger PIN: %s", app.wsgi_app.pin)
 
     # Blueprints
-    # app.register_blueprint(bp.receita)
-    # app.register_blueprint(bp.usuario)
-    app.register_blueprint(bp.main)
+    # URL API
+    bp.bp_api.url_prefix = '/api/v{API_VERSION}'.format(**app.config)
+    app.register_blueprint(bp.bp_api)
+
+    app.logger.debug(pp.pformat(app.url_map))
 
     return app
 

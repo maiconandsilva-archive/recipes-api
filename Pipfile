@@ -13,6 +13,8 @@ sqlalchemy-utils = "*"
 flask-wtf = "*"
 passlib = "*"
 wtforms-alchemy = "*"
+wtforms-json = "*"
+babel = "*"
 
 [dev-packages]
 pytest = "*"
