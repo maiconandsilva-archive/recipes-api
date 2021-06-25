@@ -12,6 +12,7 @@ pymysql = "*"
 sqlalchemy-utils = "*"
 flask-wtf = "*"
 passlib = "*"
+wtforms-alchemy = "*"
 
 [dev-packages]
 pytest = "*"
