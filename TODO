@@ -1,0 +1,40 @@
+- Login [POST] e Logout [POST,GET] - Usuario
+- Criar e deletar - Usuario
+
+- Criar rota api: /api/v<versao>/[AQUI FICAM AS ROTAS]
+
+- Criar SQL script para inicializar o banco
+    Categorias
+    Ingredientes comuns
+    Unidades comuns
+
+- Frontend. 3 Telas
+
+- Terminar API (Verificar se é possível fazer um ApiResourceFactory (não é prioridade))
+    /
+    /usuario
+    /usuario/receitas
+    /usuario/conta/autenticar
+    /usuario/conta/sair
+    /usuario/conta/criar
+    /usuario/conta/excluir
+    /api/v1/receitas/
+    /api/v1/receitas/<receita_id>
+    /api/v1/receitas/categorias
+    /api/v1/receitas/categorias/<categoria_id>
+    /api/v1/receitas/ingredientes/
+    /api/v1/receitas/ingredientes/<ingrediente_id>
+    /api/v1/receitas/ingredientes/unidades-de-medida/
+    /api/v1/receitas/ingredientes/unidades-de-medida/<unidades_medida_id>
+
+    /
+    /usuario/minhas-receitas - POR ULTIMO (NAO SEI SE E NECESSARIO)
+
+- README.md
+
+- VÍDEO
+
+- relatorio - por ultimo
+
+- LER o arquivo da tarefa NOVAMENTE
+

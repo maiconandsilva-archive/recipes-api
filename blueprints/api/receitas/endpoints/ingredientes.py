@@ -22,3 +22,20 @@ def buscar_por_id(ingrediente_id: int):
 
     return ingrediente.serialize()
 
+
+@bp_ingredientes.route('/editar', methods=['POST'])
+@requer_autenticacao
+def editar():
+    return 200
+
+
+@bp_ingredientes.route('/criar', methods=['POST'])
+@requer_autenticacao
+def criar():
+    pass
+
+
+@bp_ingredientes.route('/excluir', methods=['POST'])
+@requer_autenticacao
+def deletar():
+    pass

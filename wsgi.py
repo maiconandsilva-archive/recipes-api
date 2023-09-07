@@ -52,9 +52,27 @@ def create_app():
     # Blueprints
     # URL API
     bp.bp_api.url_prefix = '/api/v{API_VERSION}'.format(**app.config)
-    app.register_blueprint(bp.bp_api)
 
-    app.logger.debug(pp.pformat(app.url_map))
+    # Static folder of main is the same as the app
+    bp.bp_main.static_folder = app.static_folder
+
+    app.register_blueprint(bp.bp_api)
+    app.register_blueprint(bp.bp_main)
+    app.register_blueprint(bp.bp_errors)
+
+    def get_bp_urls(blueprint):
+        from flask import Flask
+        temp_app = Flask(__name__)
+        temp_app.register_blueprint(blueprint)
+        return [rule for rule in temp_app.url_map.iter_rules()]
+
+    print([(f.__annotations__, f.__doc__) for f in app.view_functions.values()])
+
+    # rules = get_bp_urls(bp.bp_api)
+
+    # for rule in rules:
+    #     if rule.endpoint != 'static':
+    #         print(rule.methods)
 
     return app
 

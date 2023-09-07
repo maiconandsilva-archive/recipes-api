@@ -1,4 +1,6 @@
+from uuid import uuid4
 import pytest
+
 
 from models.usuario import *
 from models.receitas import *
@@ -6,7 +8,7 @@ from models.receitas import *
 
 @pytest.fixture
 def usuario_teste():
-    yield Usuario.query.filter(Usuario.email == 'test@test.com').one_or_none()
+    yield Usuario.query.filter(Usuario.email.like('test%@test.com')).first()
 
 
 @pytest.fixture
@@ -17,7 +19,7 @@ def receita():
 def test_create_user():
     usuario_teste = Usuario(
         nome='Test Testing',
-        email='test@test.com',
+        email=f'{uuid4()!s}@test.com',
         senha='1234567890'
     )
     usuario_teste.save(commit=True)
@@ -25,7 +27,7 @@ def test_create_user():
 
 def test_create_receita(usuario_teste):
     receita = Receita(
-        nome='Arroz Doce',
+        nome='Doce',
         descricao='Uma delícia, esse é o verdadeiro arroz doce.',
         modo_preparo=[
             'Cozinhe o arroz no leite, juntamente com a canela (utilize uma '
@@ -43,7 +45,7 @@ def test_create_receita(usuario_teste):
             nome = 'Leite Condensado',
             quantidade = 1,
             unidade_medida = UnidadeMedida(
-                id='LATA', nome='Lata', descricao='DESCRICAO'),
+                id=f'{uuid4()!s}LATA', nome='Lata', descricao='DESCRICAO'),
         )],
         categorias = [Categoria(
             nome='Doces e Sobremesas', descricao='Pudins, mousses etc')]
@@ -59,10 +61,10 @@ def test_get_delete_fixtures_not_none(receita, usuario_teste):
 def test_get_receita(receita, usuario_teste):
     assert receita.nome == 'Arroz Doce'
     assert receita.criador == usuario_teste
-    assert len(receita.ingredientes) == 1
-    assert len(receita.categorias) == 1
-    assert receita.id == receita.ingredientes[0].receita.id
-    assert receita.id == receita.categorias[0].receitas[0].id
+    assert len(receita.bp_ingredientes) == 1
+    assert len(receita.bp_categorias) == 1
+    assert receita.id == receita.bp_ingredientes[0].receita.id
+    assert receita.id == receita.bp_categorias[0].bp_receitas[0].id
 
 
 def test_get_user(usuario_teste):

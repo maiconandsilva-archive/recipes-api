@@ -1,0 +1,16 @@
+{
+  "name": "receitas",
+  "version": "1.0.0",
+  "description": "Gerenciamento de receitas e ingredientes.",
+  "scripts": {
+    "build": "docker-compose build",
+    "start": "docker-compose up -d",
+    "logs": "docker-compose logs --tail 50 -f $1",
+    "test": "docker-compose exec backend python -m pytest $1"
+  },
+  "author": "Maicon Mauricio",
+  "license": "MIT",
+  "dependencies": {
+    "swagger-editor-dist": "^3.16.5"
+  }
+}

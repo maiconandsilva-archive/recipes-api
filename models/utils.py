@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
-from functools import wraps
+from functools import cached_property, wraps
+from sqlalchemy import exc
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.sql.functions import func
 from sqlalchemy.sql.schema import Column as SAColumn
@@ -17,10 +18,31 @@ class Column(SAColumn):
     def unique_params(self, *optionaldict, **kwargs):
         super().params(*optionaldict, **kwargs)
 
-    @wraps(SAColumn.__init__)
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('nullable', False)
         super().__init__(*args, **kwargs)
+
+
+
+# class Base:
+#     __dc_fields = None
+
+    # def __get_dc_fields__(self):
+    #     return self.__dc_fields
+
+    # def __set_dc_fields__(self, fields):
+    #     self.__dc_fields = fields
+
+    # # VS Code Pylance shows error on using the normal syntax (`property.setter`)
+    # __dataclass_fields__ = property(__get_dc_fields__, __set_dc_fields__)
+
+    # @property
+    # def __dataclass_fields__(self):
+    #     return self.__dc_fields
+
+    # @__dataclass_fields__.setter
+    # def __dataclass_fields__(self, fields):
+    #     self.__dc_fields = fields
 
 
 @dataclass(init=False)
@@ -31,13 +53,19 @@ class BaseModel(db.Model):
 
     def save(self, commit=False):
         db.session.add(self)
-        if commit:
+        return not commit or self.commit()
+
+    def commit(self):
+        try:
             db.session.commit()
+            return True
+        except exc.IntegrityError:
+            db.session.rollback()
+            return False
 
     def delete(self, commit=False):
         db.session.delete(self)
-        if commit:
-            db.session.commit()
+        return not commit or self.commit()
 
     def serialize(self, **kwargs) -> dict:
         return serialize(self, **kwargs)
